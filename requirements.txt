@@ -1,0 +1,9 @@
+spacy
+streamlit
+matplotlib
+yfinance
+pandas
+numpy
+spacy_streamlit
+yahoo_fin
+spacytextblob

@@ -13,7 +13,6 @@ plt.style.use("ggplot")
 category= []
 company_name=[]
 stock_indices = ["-","NIFTY50","DOW","FTSE100","FTSE250","IBOVESPA","NASDAQ","NIFTYBANK","SP500"]
-# stock_indices_code = {"NIFTY50":"tickers_nifty50(True)","DOW":"tickers_dow(True)","FTSE100(True)":"tickers_ftse100(True)","FTSE250(True)":"tickers_ftse250(True)","IBOVESPA(True)":"tickers_ibovespa(True)","NASDAQ":"tickers_nasdaq(True)","NIFTYBANK":"tickers_niftybank(True)","SP500":"tickers_sp500(True)"}
 def retrieve_companyname(data,fetch,tic):
     data = data.dropna()
     comp_name= list(data[fetch])
@@ -23,37 +22,27 @@ def retrieve_companyname(data,fetch,tic):
 def linechart_format(data):
     new_date = data.columns
     df_list = data.values.tolist()
-    # print (products_list)
     if len(df_list) >1:
         calu = df_list[0]
-        # print(calu)
+        
         cal = calu.pop(0)
         new_cal = calu
-        # print(new_cal)
+        
     else:
         cal = df_list.pop(0)
         new_cal = df_list
-    # print("Converting frame to list")
-    # print(cal)
-    # print('name of the calculation')
     new_date =list(data[1:])[1:] 
-    # print(new_date)
-    # print("x axis")
-    # print(new_cal)
-    # print("y_axis")
     df = pd.DataFrame({
     'date': new_date,
     cal: new_cal
     })
 
     df = df.rename(columns={'date':'index'}).set_index('index')
-    # print("reordered")
-    # print(df)
     return df
 
 
-st.title("Mini-Eikon")
-st.sidebar.title("Mini-Eikon")
+st.title("Mini-Refinitiv Eikon")
+st.sidebar.title("Mini- Refinitiv Eikon")
 
 menu = st.sidebar.selectbox("Menu",["Overview","Ownership","Financial Statments","Analyst estimates","piotroski F-score","Benish M-score","News","Charts"],index =0)
 

@@ -30,7 +30,7 @@ def sentiment(text):
          text = text.replace(words,"** {} **".format(words))
     text_summ = text     
     sub_words = ', '.join(sub_words)
-    for entity in docx.ents:
+    for entity in nlp(text).ents:
         entities.append(entity.text+"("+spacy.explain(entity.label_)+")")
     key_entity = ', '.join(list(set(entities)))
     return docx,sentiment_score,sub_words,text_summ,key_entity

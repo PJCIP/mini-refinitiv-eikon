@@ -6,7 +6,7 @@ import pandas as pd
 def esg(ticker):
     firm_data = yfs.Ticker(ticker)
     esg_data = pd.DataFrame(firm_data.sustainability)
-    
+       
     return esg_data
 def statements(ticker):
     balance_sheet = yf.get_balance_sheet(ticker)

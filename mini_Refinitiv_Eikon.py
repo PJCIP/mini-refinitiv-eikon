@@ -256,6 +256,7 @@ elif menu =="News":
     sent_score = []
     postive_news = 0
     negative_news = 0
+    neutral_news = 0
     total_news = len(newsdata)
     
     st.title("News")
@@ -273,11 +274,15 @@ elif menu =="News":
                 st.markdown(text_summary)
             else:    
                 st.write(summary)
-            st.markdown('''Key-entities - {}'''.format(key_entity))
+            st.markdown('''*Key-entities - {} *'''.format(key_entity))
             sent_score.append(sentiment_score)
-            if sentiment_score > 0 or sentiment_score == 0:
+            if sentiment_score > 0: 
                 postive_news+=1
                 st.markdown('''<p style="color:green">Sentiment score = {:.3f}</p>
+            '''.format(sentiment_score), unsafe_allow_html=True)
+            elif sentiment_score == 0:
+                neutral_news+=1
+                st.markdown('''<p>Sentiment score = {:.3f}</p>
             '''.format(sentiment_score), unsafe_allow_html=True)
 
             else:
@@ -292,7 +297,8 @@ elif menu =="News":
         - Total no. of news = {}
         - No. of positive news = {}
         - No. of negative news = {}
-        '''.format(total_news,postive_news,negative_news))
+        - No. of neutral news = {}
+        '''.format(total_news,postive_news,negative_news,neutral_news))
     if avg_sentiment > 0 or avg_sentiment == 0:
         st.markdown('''
             - <p style="color:green"> Average sentiment score = {:.3f}</p>

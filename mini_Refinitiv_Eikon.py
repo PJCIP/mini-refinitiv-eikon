@@ -44,7 +44,7 @@ def linechart_format(data):
 st.title("Mini-Refinitiv Eikon")
 st.sidebar.title("Mini- Refinitiv Eikon")
 
-menu = st.sidebar.selectbox("Menu",["Overview","Ownership","Financial Statments","Analyst estimates","piotroski F-score","Benish M-score","News","Charts"],index =0)
+menu = st.sidebar.selectbox("Menu",["Overview","Ownership","ESG","Financial Statments","Analyst estimates","piotroski F-score","Benish M-score","News","Charts"],index =0)
 
 #sidebar - Starts
 search = st.sidebar.radio("Choose one of the option: ",["Type the ticker","Search for ticker in stock index list"],index = 0)
@@ -311,6 +311,11 @@ elif menu == "Financial Statments":
     st.dataframe(cash_flow)
     st.subheader('Income statement')
     st.dataframe(income_statement)
+
+elif menu == "ESG":
+    esg_table = companyinfo.esg(symbol)
+    st.title('Environmental, Social and Governance')
+    st.dataframe(esg_table)
 
 
 

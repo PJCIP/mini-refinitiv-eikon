@@ -144,7 +144,7 @@ elif menu == 'Ownership':
 
 elif menu == "Analyst estimates":
     analyst_estimate = companyinfo.analyst_info(symbol)
-    st.title('Analyst estimate')
+    st.title('Analyst estimate (Currency in USD)')
     st.subheader('Earnings Estimate information:')
     st.dataframe(analyst_estimate['Earnings Estimate'])
     st.subheader('Revenue Estimate information:')

@@ -8,7 +8,7 @@ from src import companyinfo
 from src import piotroski_with_chart
 from src import piotroski
 from src import benish
-from src import sentimentanalyzer
+# from src import sentimentanalyzer
 plt.style.use("ggplot")
 category= []
 company_name=[]

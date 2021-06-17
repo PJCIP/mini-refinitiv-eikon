@@ -43,8 +43,8 @@ def linechart_format(data):
 
 st.title("Mini-Refinitiv Eikon")
 st.sidebar.title("Mini- Refinitiv Eikon")
-# ,"News"
-menu = st.sidebar.selectbox("Menu",["Overview","Ownership","Financial Statments","Analyst estimates","piotroski F-score","Benish M-score","Charts"],index =0)
+
+menu = st.sidebar.selectbox("Menu",["Overview","Ownership","Financial Statments","Analyst estimates","piotroski F-score","Benish M-score","News","Charts"],index =0)
 
 #sidebar - Starts
 search = st.sidebar.radio("Choose one of the option: ",["Type the ticker","Search for ticker in stock index list"],index = 0)

@@ -8,7 +8,7 @@ from src import companyinfo
 from src import piotroski_with_chart
 from src import piotroski
 from src import benish
-# from src import sentimentanalyzer
+from src import sentimentanalyzer
 plt.style.use("ggplot")
 category= []
 company_name=[]
@@ -251,56 +251,56 @@ elif menu == "Benish M-score":
     st.warning('Beneish M-score is a probabilistic model, so it cannot detect companies that manipulate their earnings with 100% accuracy.')
     st.warning('Financial institutions were excluded from the sample in Beneish paper when calculating M-score. It means that the M-score for fraud detection cannot be applied among financial firms (banks, insurance).')
 
-# elif menu =="News":
-#     newsdata = companyinfo.fetch_news(symbol)
-#     sent_score = []
-#     postive_news = 0
-#     negative_news = 0
-#     total_news = len(newsdata)
+elif menu =="News":
+    newsdata = companyinfo.fetch_news(symbol)
+    sent_score = []
+    postive_news = 0
+    negative_news = 0
+    total_news = len(newsdata)
     
-#     st.title("News")
-#     my_expander = st.beta_expander(label='View News')
-#     with my_expander:
-#         for news in newsdata:
-#             summary = news['summary']
-#             link = news['link']
-#             title = news['title']
-#             date = news['published']
-#             docx,sentiment_score,sub_words,text_summary,key_entity = sentimentanalyzer.sentiment(summary)
-#             st.subheader(title)
-#             st.write('''published date: {}'''.format(date))
-#             if text_summary:
-#                 st.markdown(text_summary)
-#             else:    
-#                 st.write(summary)
-#             st.markdown('''Key-entities - {}'''.format(key_entity))
-#             sent_score.append(sentiment_score)
-#             if sentiment_score > 0 or sentiment_score == 0:
-#                 postive_news+=1
-#                 st.markdown('''<p style="color:green">Sentiment score = {:.3f}</p>
-#             '''.format(sentiment_score), unsafe_allow_html=True)
+    st.title("News")
+    my_expander = st.beta_expander(label='View News')
+    with my_expander:
+        for news in newsdata:
+            summary = news['summary']
+            link = news['link']
+            title = news['title']
+            date = news['published']
+            docx,sentiment_score,sub_words,text_summary,key_entity = sentimentanalyzer.sentiment(summary)
+            st.subheader(title)
+            st.write('''published date: {}'''.format(date))
+            if text_summary:
+                st.markdown(text_summary)
+            else:    
+                st.write(summary)
+            st.markdown('''Key-entities - {}'''.format(key_entity))
+            sent_score.append(sentiment_score)
+            if sentiment_score > 0 or sentiment_score == 0:
+                postive_news+=1
+                st.markdown('''<p style="color:green">Sentiment score = {:.3f}</p>
+            '''.format(sentiment_score), unsafe_allow_html=True)
 
-#             else:
-#                 negative_news+=1
-#                 st.markdown('''<p style="color:red">Sentiment score = {:.3f}.</p>
-#             '''.format(sentiment_score), unsafe_allow_html=True)
+            else:
+                negative_news+=1
+                st.markdown('''<p style="color:red">Sentiment score = {:.3f}.</p>
+            '''.format(sentiment_score), unsafe_allow_html=True)
 
-#             st.markdown('''[click here to read more]({})'''.format(link))
+            st.markdown('''[click here to read more]({})'''.format(link))
 
-#     avg_sentiment = sum(sent_score)/total_news
-#     st.markdown('''
-#         - Total no. of news = {}
-#         - No. of positive news = {}
-#         - No. of negative news = {}
-#         '''.format(total_news,postive_news,negative_news))
-#     if avg_sentiment > 0 or avg_sentiment == 0:
-#         st.markdown('''
-#             - <p style="color:green"> Average sentiment score = {:.3f}</p>
-#             '''.format(avg_sentiment), unsafe_allow_html=True)
-#     else:
-#             st.markdown('''
-#             - <p style="color:red">Average sentiment score =  {:.3f}</p>
-#             '''.format(avg_sentiment), unsafe_allow_html=True)
+    avg_sentiment = sum(sent_score)/total_news
+    st.markdown('''
+        - Total no. of news = {}
+        - No. of positive news = {}
+        - No. of negative news = {}
+        '''.format(total_news,postive_news,negative_news))
+    if avg_sentiment > 0 or avg_sentiment == 0:
+        st.markdown('''
+            - <p style="color:green"> Average sentiment score = {:.3f}</p>
+            '''.format(avg_sentiment), unsafe_allow_html=True)
+    else:
+            st.markdown('''
+            - <p style="color:red">Average sentiment score =  {:.3f}</p>
+            '''.format(avg_sentiment), unsafe_allow_html=True)
 
 elif menu == "Financial Statments":   
     balance_sheet,cash_flow,income_statement = companyinfo.statements(symbol)

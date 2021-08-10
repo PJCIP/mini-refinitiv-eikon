@@ -4,6 +4,7 @@ spacy==3.0.6
 spacy_streamlit==1.0.0
 matplotlib==3.3.4
 pandas==1.2.3
-yfinance==0.1.59
+yfinance==0.1.63
 yahoo_fin==0.8.8
+yahoo-finance==1.4.0
 spacytextblob==3.0.1

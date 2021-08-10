@@ -9,9 +9,11 @@ def esg(ticker):
        
     return esg_data
 def statements(ticker):
-    balance_sheet = yf.get_balance_sheet(ticker)
-    cash_flow = yf.get_cash_flow(ticker)
-    income_statement = yf.get_income_statement(ticker)
+    cmp = yfs.Ticker(ticker)
+    balance_sheet = cmp.balance_sheet
+    cash_flow = cmp.cashflow
+    income_statement = cmp.financials
+    # years = balance_sheet.columns
     return balance_sheet,cash_flow,income_statement
 
 def info(ticker):
@@ -27,12 +29,13 @@ def info(ticker):
 
 def stock_holders(ticker):
     major = yfs.Ticker(ticker).major_holders
-    stockholders =  yf.get_holders(ticker)
+    institutional_holders  =  yfs.Ticker(ticker).institutional_holders
+    # print(stockholders)
     major_dict = major.to_dict('split')
     # print(major_dict)
-    direct_holders = stockholders['Direct Holders (Forms 3 and 4)']
-    institutional_holders = stockholders['Top Institutional Holders']
-    return major_dict,direct_holders,institutional_holders
+    # direct_holders = stockholders['Direct Holders (Forms 3 and 4)']
+    # institutional_holders = stockholders['Top Institutional Holders']
+    return major_dict,major,institutional_holders
 
 def fetch_news(ticker):
     news_data = news.get_yf_rss(ticker)

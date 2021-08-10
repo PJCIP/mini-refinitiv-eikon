@@ -123,7 +123,9 @@ if menu == 'Overview':
         st.info('Please select one symbol')
 elif menu == 'Ownership':
     try:
-        major_dict,direct_holders,institutional_holders = companyinfo.stock_holders(symbol)
+        major_dict,major_holders,institutional_holders = companyinfo.stock_holders(symbol)
+        print(major_dict)
+        print(institutional_holders)
         st.title('Ownership')
         st.markdown('''
         
@@ -134,14 +136,15 @@ elif menu == 'Ownership':
         - {} - {}
         '''.format(major_dict['data'][0][1],major_dict['data'][0][0],major_dict['data'][1][1],major_dict['data'][1][0],major_dict['data'][2][1],major_dict['data'][2][0],major_dict['data'][3][1],major_dict['data'][3][0]))
 
-        st.subheader('Direct holders information:')
-        st.dataframe(direct_holders)
+        # st.subheader('Major holders information:')
+        # st.dataframe(major_holders)
         
         st.subheader('Institutional holders information:')
         st.dataframe(institutional_holders)
-    except:
-        st.info('Please select one symbol')
+    except :
 
+        st.info('There some issue in loading in this page')
+        
 elif menu == "Analyst estimates":
     analyst_estimate = companyinfo.analyst_info(symbol)
     st.title('Analyst estimate (Currency in USD)')
@@ -170,11 +173,20 @@ elif menu == "piotroski F-score":
         ''')
     name = yfs.Ticker(symbol).info['longName']
     st.subheader('Piotroski F-score for {}'.format(name))
-    fscore = piotroski.piotroski(symbol)
-    print(fscore.get('Piotroski F-score(/9)')[0])
-    print(type(fscore.get('Piotroski F-score(/9)')[0]))
-    st.markdown(' The Piotroski F-score for ** {} ** is ** {} ** and the strength of the company is considered to be ** {} **'.format(name,fscore.get('Piotroski F-score(/9)')[0],fscore.get('Strength')[0]))
-    st.dataframe(fscore)
+    fscore,flag = piotroski.piotroski(symbol)
+    if flag == 404:
+        st.info("Unable to fetch the financial statements")
+    elif flag == 500:
+        st.info("Unable to calculate scores")
+    elif flag == 200:
+        print(fscore.get('Piotroski F-score(/9)')[0])
+        print(type(fscore.get('Piotroski F-score(/9)')[0]))
+        st.markdown(' The Piotroski F-score for ** {} ** is ** {} ** and the strength of the company is considered to be ** {} **'.format(name,fscore.get('Piotroski F-score(/9)')[0],fscore.get('Strength')[0]))
+        fscore = fscore.head(1).transpose()
+        fscore.columns = ['Piotroski Score of '+name]
+        # fscore = fscore[1:]
+        # piotro_fscore = fscore.head(1).transpose()
+        st.dataframe(fscore)
 
 elif menu == 'Charts':
     st.title("Charts of Piotroski - F Score")

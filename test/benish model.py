@@ -21,57 +21,65 @@ def get_data(ticker):
     global cash_flow
     global income_statement
     global years
-    balance_sheet = yf.get_balance_sheet(ticker)
-    cash_flow = yf.get_cash_flow(ticker)
-    income_statement = yf.get_income_statement(ticker)
-    years = balance_sheet.columns
-    # # print("b")
-    # print(balance_sheet)
-    # # print("c")
-    # print(cash_flow)
-    # # print("i")
-    # print(income_statement)
+    try:
+        balance_sheet = yf.get_balance_sheet(ticker)
+        cash_flow = yf.get_cash_flow(ticker)
+        income_statement = yf.get_income_statement(ticker)
+        years = balance_sheet.columns
+    except:
+        cmp = yfs.Ticker(ticker)
+        balance_sheet = cmp.balance_sheet
+        cash_flow = cmp.cashflow
+        income_statement = cmp.financials
+        years = balance_sheet.columns
+
+    print("b")
+    print(balance_sheet)
+    print("c")
+    print(cash_flow)
+    print("i")
+    print(income_statement)
 
 def ratios():
    #Days Sales in Receivables Index(DSRI)
-    net_rec = balance_sheet[years[0]]['netReceivables']
-    net_rec_py = balance_sheet[years[1]]['netReceivables']
-    sales = income_statement[years[0]]['totalRevenue']
-    sales_py = income_statement[years[1]]['totalRevenue']
+    net_rec = balance_sheet[years[0]]['Net Receivables']
+    net_rec_py = balance_sheet[years[1]]['Net Receivables']
+    sales = income_statement[years[0]]['Total Revenue']
+    sales_py = income_statement[years[1]]['Total Revenue']
     DSRI = (net_rec/sales)/(net_rec_py/sales_py)
     #Gross Margin Index(GMI)
-    cogs = income_statement[years[0]]['costOfRevenue']
-    cogs_py = income_statement[years[1]]['costOfRevenue']
+    cogs = income_statement[years[0]]['Cost Of Revenue']
+    cogs_py = income_statement[years[1]]['Cost Of Revenue']
     GMI = ((sales_py - cogs_py)/sales_py)/((sales-cogs)/sales)
     #Asset Quality Index(AQI)
-    current_asset = balance_sheet[years[0]]['totalCurrentAssets']
-    ppe = balance_sheet[years[0]]['propertyPlantEquipment']
-    securities =balance_sheet[years[0]]['commonStock']+balance_sheet[years[0]]['shortTermInvestments']
-    total_asset =balance_sheet[years[0]]['totalAssets']
-    current_asset_py = balance_sheet[years[1]]['totalCurrentAssets']
-    ppe_py = balance_sheet[years[1]]['propertyPlantEquipment']
-    securities_py =balance_sheet[years[1]]['commonStock']+balance_sheet[years[1]]['shortTermInvestments']
-    total_asset_py =balance_sheet[years[1]]['totalAssets']
+    current_asset = balance_sheet[years[0]]['Total Current Assets']
+    ppe = balance_sheet[years[0]]['Property Plant Equipment']
+    securities =balance_sheet[years[0]]['Common Stock']+balance_sheet[years[0]]['Short Term Investments']
+    total_asset =balance_sheet[years[0]]['Total Assets']
+    current_asset_py = balance_sheet[years[1]]['Total Current Assets']
+    ppe_py = balance_sheet[years[1]]['Property Plant Equipment']
+    securities_py =balance_sheet[years[1]]['Common Stock']+balance_sheet[years[1]]['Short Term Investments']
+    total_asset_py =balance_sheet[years[1]]['Total Assets']
     AQI =(1-(current_asset+ppe+securities)/total_asset)/(1-(current_asset_py+ppe_py+securities_py)/total_asset_py)
     #Sales growth index
     SGI = sales/sales_py
     #Depreciation index
-    Depr = cash_flow[years[0]]['depreciation']
-    Depr_py =cash_flow[years[1]]['depreciation']
+    Depr = cash_flow[years[0]]['Depreciation']
+    Depr_py =cash_flow[years[1]]['Depreciation']
     DEPI = (Depr_py/(ppe_py+Depr_py))/(Depr/(ppe+Depr))
     #Sales General and Administrative Expenses Index
-    sga = income_statement[years[0]]['sellingGeneralAdministrative']
-    sga_py = income_statement[years[1]]['sellingGeneralAdministrative']
+    sga = income_statement[years[0]]['Selling General Administrative']
+    sga_py = income_statement[years[1]]['Selling General Administrative']
     SGAI = (sga/sales)/(sga_py/sales_py)
     #Leverage Index
-    current_liab = balance_sheet[years[0]]['totalCurrentLiabilities']
-    long_term_debt =balance_sheet[years[0]]['longTermDebt']
-    current_liab_py =balance_sheet[years[1]]['totalCurrentLiabilities']
-    long_term_debt_py =balance_sheet[years[1]]['longTermDebt']
+    current_liab = balance_sheet[years[0]]['Total Current Liabilities']
+    long_term_debt =balance_sheet[years[0]]['Long Term Debt']
+    current_liab_py =balance_sheet[years[1]]['Total Current Liabilities']
+    long_term_debt_py =balance_sheet[years[1]]['Long Term Debt']
     LVGI = ((current_liab+long_term_debt)/total_asset)/(current_liab_py+long_term_debt_py)/total_asset_py
     #Total accural to total asset
-    incomefromcontops = income_statement[years[0]]['netIncomeFromContinuingOps']
-    cashfromops = cash_flow[years[0]]['totalCashFromOperatingActivities']
+    incomefromcontops = income_statement[years[0]]['Net Income From Continuing Ops']
+    cashfromops = cash_flow[years[0]]['Total Cash From Operating Activities']
     TATA = (incomefromcontops-cashfromops)/total_asset
     mscore = -4.84 +(.92*DSRI)+(.528*GMI)+(.404*AQI)+(.892*SGI)+(.115*DEPI)-(.172*SGAI)+(4.679*TATA)-(.327*LVGI)
     return mscore
@@ -88,6 +96,6 @@ def benish_m_score(ticker):
 
 ticker = 'AAPL'
 msft = yfs.Ticker(ticker).info['longName']
-print(msft)
+# print(msft)
 benish_m_score(ticker)
-print(yf.get_holders(ticker))
+# print(yf.get_holders(ticker))

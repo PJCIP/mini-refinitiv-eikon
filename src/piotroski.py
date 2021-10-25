@@ -142,8 +142,8 @@ def piotroski(ticker):
 
     return summary,flag
 
-ticker = 'AAPL'
-msft = yfs.Ticker(ticker).info['longName']
-print(msft)
-piotroski(ticker)
+# ticker = 'AAPL'
+# msft = yfs.Ticker(ticker).info['longName']
+# print(msft)
+# piotroski(ticker)
 # print(yf.get_holders(ticker))

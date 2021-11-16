@@ -9,10 +9,11 @@ from src import piotroski_with_chart
 from src import piotroski
 from src import benish
 from src import sentimentanalyzer
+from src import index
 plt.style.use("ggplot")
 category= []
 company_name=[]
-stock_indices = ["-","NIFTY50","DOW","FTSE100","FTSE250","IBOVESPA","NASDAQ","NIFTYBANK","SP500"]
+stock_indices = ["-","NIFTY50","DOW","FTSE100","NASDAQ","SP500"]
 def retrieve_companyname(data,fetch,tic):
     data = data.dropna()
     comp_name= list(data[fetch])
@@ -46,7 +47,7 @@ st.sidebar.title("Mini- Refinitiv Eikon")
 # st.title("News")
 my_expander = st.sidebar.beta_expander(label="Company's Profile")
 with my_expander:
-        menu = st.selectbox("Let's Explore",["Overview","Ownership","ESG","Financial Statments","piotroski F-score","Benish M-score","News","Charts"],index =0)
+        menu = st.selectbox("Let's Explore",["Overview","Ownership","ESG","Financial Statments","piotroski F-score","Benish M-score","News"],index =0)
 
 #sidebar - Starts
 search = st.sidebar.radio("Choose one of the option: ",["Type the ticker","Search for ticker in stock index list"],index = 0)
@@ -63,37 +64,49 @@ if search == "Type the ticker":
     
 else:
     category = st.sidebar.selectbox("Select a stock index ",stock_indices)
+    data = index.extract_tickers()
+    # print(data)
     if category == "-":
         st.info('Please select one index from dropdown')
     if category == "NIFTY50":
-        data = yf.tickers_nifty50(True)
-        company_name,ticker = retrieve_companyname(data,'Company Name','Symbol')
+        company_name = list(data["NIFTY50"].keys())
+        # print(company_name)
+        ticker = [data['NIFTY50'][cname]['Symbol']+'.NS' for cname in company_name]
+        # print(company_name)
+        # print(ticker)
     if category == "DOW":
-        data = yf.tickers_dow(True)
-        company_name,ticker = retrieve_companyname(data,'Company','Symbol')
+        company_name = list(data["DOW"].keys())
+        print(company_name)
+        ticker = [data["DOW"][cname]['Symbol'] for cname in company_name]
+        print(ticker)
     if category == "FTSE100":
-        data = yf.tickers_ftse100(True)
-        company_name,ticker = retrieve_companyname(data,'Company','EPIC')
+        # data = yf.tickers_ftse100(True)
+        # company_name,ticker = retrieve_companyname(data,'Company','EPIC')
+        company_name = list(data["FTSE100"].keys())
+        print(company_name)
+        ticker = [data["FTSE100"][cname]['Symbol'] for cname in company_name]
+        print(ticker)
     if category == "FTSE250":
-        data = yf.tickers_ftse250(True)
-        company_name,ticker = retrieve_companyname(data,'Company',"Ticker")
-        
-    if category == "IBOVESPA":
-        data = yf.tickers_ibovespa(True)
-        company_name,ticker = retrieve_companyname(data,'Share',"Symbol")
-        
+        # data = yf.tickers_ftse250(True)
+        # company_name,ticker = retrieve_companyname(data,'Company',"Ticker")
+        company_name = list(data["FTSE250"].keys())
+        print(company_name)
+        ticker = [data["FTSE250"][cname]['Symbol'] for cname in company_name]
+        print(ticker)
     if category == "NASDAQ":
-        data = yf.tickers_nasdaq(True)
-        company_name,ticker = retrieve_companyname(data,'Security Name',"Symbol")
-        
-    if category == "NIFTYBANK":
-        data = yf.tickers_niftybank()
-        company_name = data
-        ticker = data
-
+        # data = yf.tickers_nasdaq(True)
+        # company_name,ticker = retrieve_companyname(data,'Security Name',"Symbol")
+        company_name = list(data["NASDAQ"].keys())
+        print(company_name)
+        ticker = [data["NASDAQ"][cname]['Symbol'] for cname in company_name]
+        print(ticker)
     if category == "SP500":
-        data = yf.tickers_sp500(True)
-        company_name,ticker = retrieve_companyname(data,'Security',"Symbol")
+        # data = yf.tickers_sp500(True)
+        # company_name,ticker = retrieve_companyname(data,'Security',"Symbol")
+        company_name = list(data["SP500"].keys())
+        print(company_name)
+        ticker = [data["SP500"][cname]['Symbol'] for cname in company_name]
+        print(ticker)
     
     if len(company_name)==0:
         st.sidebar.info('Please wait fetching the details')

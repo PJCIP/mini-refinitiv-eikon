@@ -26,14 +26,14 @@ def stock_holders(ticker):
 def fetch_news(ticker):
     news_data = news.get_yf_rss(ticker)
     # print(news_data[0])
-    print(len(news_data))
+    # print(len(news_data))
     news_data = news_data[0]
     summary = news_data['summary']
     link = news_data['link']
     title = news_data['title']
     date = news_data['published']
-    print(title)
-    print(summary)
-    print(link)
-    print(date)
-fetch_news('AAPL')
+    # print(title)
+    # print(summary)
+    # print(link)
+    # print(date)
+# fetch_news('AAPL')

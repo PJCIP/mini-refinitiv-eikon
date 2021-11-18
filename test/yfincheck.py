@@ -9,3 +9,4 @@ msft = yf.Ticker("MSFT")
 print(msft.info)
 
 print(msft.sustainability)
+# print(msft.)

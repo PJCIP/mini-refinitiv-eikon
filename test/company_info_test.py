@@ -9,8 +9,8 @@ def esg(ticker):
     esg_data = pd.DataFrame(firm_data.sustainability)
     # esg_data['company_ticker'] = str(firm_data.ticker)
     # print(pd.DataFrame.transpose(esg_data))
-    print(esg_data.columns)
-    print(esg_data[0])
+    # print(esg_data.columns)
+    # print(esg_data[0])
     return esg_data
 
 def statements(ticker):
@@ -47,6 +47,6 @@ def analyst_info(ticker):
     analyst_data = yf.get_analysts_info(ticker)
     return analyst_data
 
-print(esg('aapl'))
+# print(esg('aapl'))
 
 

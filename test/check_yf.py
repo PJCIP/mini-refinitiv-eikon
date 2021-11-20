@@ -113,9 +113,65 @@ import pandas as pd
 # print(dates)
 # print(key_metrics)
 # Key for plotting the key metrics under fundamental analysis
-a = 3
-if a == 3:
-    print(dates[:3])
-    print(metrics['metrics'][:3])
-    print(pd.DataFrame(metrics['metrics'][:3]))
-    
+# ?
+    # print(dates[:3])
+    # print(metrics['metrics'][:3])
+    # print(pd.DataFrame(metrics['metrics'][:3]))
+
+fr = requests.get(f"https://financialmodelingprep.com/api/v3/financial-ratios/{company}?apikey={demo}")
+fr = fr.json()
+# print(fr)
+key_ratios = list(fr['ratios'][0].keys())[1:]
+print(key_ratios)
+# for k_r in key_ratios:
+#     print(k_r)
+#     ratios = list(fr['ratios'][0][k_r].keys()) 
+#     print(ratios)
+#     print("*8**************")
+#     print(fr['ratios'][:3][k_r])
+sratios='investmentValuationRatios'
+r_metrics = 'priceBookValueRatio'
+met = fr['ratios'][:3]
+# print(met)
+# print(met[0][k_r])
+# # print(met[k_r])
+# print(met[0]['date'])
+# print(fr['ratios'][:3])
+met = pd.DataFrame(fr['ratios'][:3])
+print(met[sratios])
+# # 0    {'priceBookValueRatio': '15.143644534664903', ...
+# 1    {'priceBookValueRatio': '13.116031193704353', ...
+# 2    {'priceBookValueRatio': '10.523850249565132', ...
+srat_met = pd.DataFrame(met[sratios])
+# check = srat_met[sratios][0]
+# print(pd.DataFrame(check,index=[0]))
+# # ratios
+dates = [met['date'] for i in range(3)]
+print(dates)
+ratio_options =list(srat_met[sratios][0].keys())
+print(ratio_options)
+ratios = pd.DataFrame()
+for perd in range(3):
+    ratios = ratios.append([srat_met[sratios][perd]],ignore_index=True)
+    # print(srat_met[sratios][perd])
+    # print(ratios)
+    # for r_o in ratio_options:
+    #     print(r_o,srat_met[sratios][perd][r_o])
+    #     # print()
+    #     ratios['{}'.format(r_o)] = srat_met[sratios][perd][r_o]
+ratios['date'] = dates[0]
+# print(ratios)
+print(ratios[['date','priceBookValueRatio','priceToSalesRatio']])
+# print(ratios)
+#     # ratios["{}".format(r_metrics)] = 
+  # ratios = ?pd.DataFrame(srat_met[sratios][i],index = [i])
+
+# print(ratios)
+
+# met = met[sratios][:3][r_metrics]
+# print(met)
+# dates = [met['date'][i] for i in range(len(met))]
+# print(dates)
+# date =met[0]['date'] 
+# met = met[['date']+r_metrics]
+

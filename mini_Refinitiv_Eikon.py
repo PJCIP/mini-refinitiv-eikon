@@ -2,8 +2,13 @@ import streamlit as st
 import spacy_streamlit
 import pandas as pd
 import yfinance as yfs
+import mplfinance as mpf
 from matplotlib import pyplot as plt
+import mplfinance as mpf
+import plotly.express as px
 import yahoo_fin.stock_info as yf
+import requests
+import urllib
 from src import companyinfo
 from src import piotroski_with_chart
 from src import piotroski
@@ -14,6 +19,7 @@ plt.style.use("ggplot")
 category= []
 company_name=[]
 stock_indices = ["-","NIFTY50","DOW","FTSE100","NASDAQ","SP500"]
+api_key = '5df285c077779f8519c2bc667ae30191'
 def retrieve_companyname(data,fetch,tic):
     data = data.dropna()
     comp_name= list(data[fetch])
@@ -42,13 +48,27 @@ def linechart_format(data):
     return df
 
 
+
+
+
+
 st.title("Mini-Refinitiv Eikon")
 st.sidebar.title("Mini- Refinitiv Eikon")
+# Checking for internet connection
+# while True:
+#     strframe1 = st.empty()
+#     try :
+#         stri = "https://www.google.co.in"
+#         data = urllib.urlopen(stri)
+#         # print ("Connected")
+#         # st.empty()
+#         strframe1.success('Connected to Internet')
+#     except:
+#         # print ("not connected" ,e )
+#         st.empty()
+#         strframe1.info('Please Check your internet connection')
+        # print("No internet connection.")
 # st.title("News")
-my_expander = st.sidebar.beta_expander(label="Company's Profile")
-with my_expander:
-        menu = st.selectbox("Let's Explore",["Overview","Ownership","ESG","Financial Statments","piotroski F-score","Benish M-score","News"],index =0)
-
 #sidebar - Starts
 search = st.sidebar.radio("Choose one of the option: ",["Type the ticker","Search for ticker in stock index list"],index = 0)
 if search == "Type the ticker":
@@ -118,6 +138,12 @@ else:
         if symbol:
             st.sidebar.write("You have a selected {} and the ticker is {}".format(company,symbol))
 #Sidebar ends
+
+my_expander = st.sidebar.beta_expander(label="Company's Profile")
+with my_expander:
+        menu = st.selectbox("Let's Explore",["-","Overview","Ownership","ESG","Financial Statments","piotroski F-score","Benish M-score","News"],index =0)
+
+
 #Start of main page
 if menu == 'Overview':
     try:
@@ -351,4 +377,131 @@ elif menu == "ESG":
     st.dataframe(esg_table)
 
 
+fundamental_expander = st.sidebar.beta_expander(label="Fundamental Analysis")
 
+with fundamental_expander:
+        fund_menu = st.selectbox("Let's Explore",["-","Candle chart","DCF","Key Metrics","SSGR","Ratios"],index =0)
+
+if fund_menu == "Candle chart":
+    st.title('Candle chart (Historical data)')
+    period, interval, format = st.beta_columns(3) 
+    # ,,,,,,,,,,
+    period_dict = {'1 day':'1d','5 day':'5d','1 month':'1mo','3 months':'3mo','6 months':'6mo','1 year':'1y','2 years':'2y','5 years':'5y','10 years':'10y','year to date':'ytd','max':'max'}
+    interval_dict ={'1 min':'1m','2 min':'2m','5 min':'5m','15 min':'15m','30 min':'30m','60 min':'60m','90 min':'90m','1 hr':'1h','1 day':'1d','5 day':'5d','1 week':'1wk','1 month':'1mo','3 month':'3mo'}
+    with period:
+        speriod = st.selectbox('Select the period',['1 day','5 day','1 month','3 months','6 months','1 year','2 years','5 years','10 years','year to date','max'])
+
+    with interval:
+        sinterval = st.selectbox('Select the interval',['1 min','2 min','5 min','15 min','30 min','60 min','90 min','1 hr','1 day','5 day','1 week','1 month','3 month'])
+
+    with format:
+        sformat = st.selectbox('Select a format',['Table','Chart'])
+
+    data = yfs.download(tickers = symbol, period = period_dict[speriod], interval = interval_dict[sinterval])
+    # fig, ax = mpf.plot(data,type='candle',mav=(3,6,9),volume=True,show_nontrading=True)
+    # print(symbol)
+    if sformat == "Table":
+        st.dataframe(data)
+    elif sformat == "Chart":
+        fig, ax = mpf.plot(
+                data,
+                type="candle",
+                style="yahoo",
+                volume=True,
+                returnfig=True,
+                title=f"{yfs.Ticker(symbol).info['longName']}",
+                figratio=(16, 7),
+                figscale=1.2,
+            )
+        st.write(fig)
+
+elif fund_menu == "Key Metrics":
+    st.title('Company Key Metrics')
+    metrics = requests.get(f'https://financialmodelingprep.com/api/v3/company-key-metrics/{symbol}?apikey={api_key}')
+    metrics = metrics.json()
+    k_metrics = st.multiselect('Select key metrics', list(metrics['metrics'][0].keys())[1:])
+    period, format = st.beta_columns(2) 
+    with period:
+        speriod = st.selectbox('Select the period',['3 years','5 years','10 years','max'])
+    with format:
+        sformat = st.selectbox('Select a format',['Table','Chart'])
+    if len(k_metrics) == 0:
+        st.info('Please choose atleast one of key_metrics')
+    else:
+        if speriod != 'max':
+            met = pd.DataFrame(metrics['metrics'][:int(speriod.split(' ')[0])])
+            met = met[['date']+k_metrics]
+        else:
+            met = pd.DataFrame(metrics['metrics'])
+            met = met[['date']+k_metrics]
+        # met['date'] = pd.to_datetime(met['date'])
+        met.index = met['date']
+        met.index.name = 'date'
+        met.drop(['date'], axis = 1,inplace=True)
+        for metri in k_metrics:
+            met[metri] = pd.to_numeric(met[metri], downcast="float")
+        if sformat == 'Table':
+            st.dataframe(met)
+        else:
+            rel = met.pct_change()
+            cumret = (1+rel).cumprod() - 1
+            cumret = cumret.fillna(0)
+            st.line_chart(cumret)
+
+elif fund_menu == "Ratios":
+    st.title('Financial ratios')
+    fr = requests.get(f"https://financialmodelingprep.com/api/v3/financial-ratios/{symbol}?apikey={api_key}")
+    fr = fr.json()
+    key_ratios = list(fr['ratios'][0].keys())[1:]
+    period, ratios,format = st.beta_columns(3) 
+    with period:
+        speriod = st.selectbox('Select the period',['3 years','5 years','10 years','max'])
+    with format:
+        sformat = st.selectbox('Select a format',['Table','Chart'])
+    with ratios:
+        sratios = st.selectbox('Select a format',key_ratios)
+    r_metrics = st.multiselect('Select key ratios', list(list(fr['ratios'][0][sratios].keys())))
+    if len(r_metrics) == 0:
+        st.info('Please choose atleast one of key_metrics')
+    else:
+        if speriod != 'max':
+            met = pd.DataFrame(fr['ratios'][:int(speriod.split(' ')[0])])
+            srat_met = pd.DataFrame(met[sratios])
+            dates = [met['date'] for i in range(int(speriod.split(' ')[0]))]
+            ratios = pd.DataFrame()
+            for perd in range(int(speriod.split(' ')[0])):
+                ratios = ratios.append([srat_met[sratios][perd]],ignore_index=True)
+            ratios['date'] = dates[0]
+            ratios = ratios[['date']+r_metrics]
+            
+            
+
+        else:
+            met = pd.DataFrame(fr['ratios'])
+            srat_met = pd.DataFrame(met[sratios])
+            dates = [met['date'] for i in range(len(met))]
+            ratios = pd.DataFrame()
+            for perd in range(len(met)):
+                ratios = ratios.append([srat_met[sratios][perd]],ignore_index=True)
+            ratios['date'] = dates[0]
+            ratios = ratios[['date']+r_metrics]
+        ratios.index = ratios['date']
+        ratios.index.name = 'date'
+        ratios.drop(['date'], axis = 1,inplace=True)
+        for metri in r_metrics:
+            ratios[metri] = pd.to_numeric(ratios[metri], downcast="float")
+        if sformat == 'Table':
+            st.dataframe(ratios)
+        else:
+            rel = ratios.pct_change()
+            cumret = (1+rel).cumprod() - 1
+            cumret = cumret.fillna(0)
+            st.line_chart(cumret)
+            
+    
+
+elif fund_menu == "DCF":
+    pass
+
+elif fund_menu == "SSGR":
+    pass

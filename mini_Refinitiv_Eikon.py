@@ -15,6 +15,7 @@ from src import piotroski
 from src import benish
 from src import sentimentanalyzer
 from src import index
+from src import fundamental
 plt.style.use("ggplot")
 category= []
 company_name=[]
@@ -380,7 +381,7 @@ elif menu == "ESG":
 fundamental_expander = st.sidebar.beta_expander(label="Fundamental Analysis")
 
 with fundamental_expander:
-        fund_menu = st.selectbox("Let's Explore",["-","Candle chart","DCF","Key Metrics","SSGR","Ratios"],index =0)
+        fund_menu = st.selectbox("Let's Explore",["-","Candle chart","Understanding Market Return","DCF","Key Metrics","Ratios"],index =0)
 
 if fund_menu == "Candle chart":
     st.title('Candle chart (Historical data)')
@@ -501,7 +502,116 @@ elif fund_menu == "Ratios":
     
 
 elif fund_menu == "DCF":
-    pass
+    st.title("Discounted Cash Flow")
+    market,period = st.beta_columns(2)
+    with market:
+        smarket = st.selectbox('Select the market',['Global Market','Indian Market'])
+        
+    with period:
+        speriod = st.selectbox('Select the period',['Before pandemic','During pandemic','Current'])
 
-elif fund_menu == "SSGR":
-    pass
+    
+               
+        # ke,kd,RF,ETR,LTGrowth,Terminal_value,Terminal_value_Discounted,target_equity_value,target_value,target_price_per_share,beta,credit_spread,npv,revenue_g,bs_forec,CF_forec=fundamental.dcf(ticker,smarket,speriod)
+    
+    ke,kd,RF,ETR,LTGrowth,Terminal_value,Terminal_value_Discounted,target_equity_value,target_value,target_price_per_share,beta,credit_spread,WACC,Debt_to,equity_to,npv,revenue_g,bs_forec,CF_forec,is_forec,yearlyreturn,currency=fundamental.dcf(symbol,smarket,speriod)
+    title,header = st.beta_columns(2)
+    with title:
+        st.subheader('Revenue Growth rate: {:.4f}'.format(revenue_g))
+    with header:
+        st.subheader('Long Term Inflation Rate: {:.4f}'.format(LTGrowth))
+    
+    title,header = st.beta_columns(2)
+    with title:
+        st.subheader('Forecasted Statments:')
+    with header:
+        sstatement = st.selectbox('Select the Forecasted statement',['FCF','Balance Sheet','Income Statement'])
+    if sstatement == 'FCF':
+        st.dataframe(CF_forec)
+    elif sstatement == 'Balance Sheet':
+        st.dataframe(bs_forec)
+    elif sstatement == 'Income Statement':
+        st.dataframe(is_forec)
+    
+    wacc_expander = st.beta_expander(label='Weighted Average Cost of Capital: {:.4f}'.format(WACC))
+    with wacc_expander:
+        kcd,wd,we,t = st.beta_columns(4)
+        with kcd:
+            st.subheader('Cost of Debt: {:.4f}'.format(kd))
+        with wd:
+            st.subheader('Weight of Debt: {:.4f}'.format(Debt_to))
+        with we:
+            st.subheader('Weight of Equity: {:.4f}'.format(equity_to))
+        with t:
+            st.subheader('Effective Tax Rate: {:.4f}'.format(ETR))
+
+    ke_expander = st.beta_expander(label='Cost of equity: {:.4f}'.format(ke))
+    with ke_expander:
+        mn,rf,b,yr = st.beta_columns(4)
+        with mn:
+            if smarket == 'Global Market':
+                st.subheader(f"Market Name: S&P 500")
+
+            elif smarket == 'Indian Market':
+                st.subheader(f"Market Name: Nifty 50")
+                        
+        with rf:
+            st.subheader('Risk Free Rate: {:.4f}'.format(RF))
+        with b:
+            st.subheader('Beta: {:.4f}'.format(beta))
+        with yr:
+            st.subheader('Market Yearly Return: {:.4f}'.format(yearlyreturn))
+
+    
+
+    
+    tv,tvd = st.beta_columns(2)
+    with tv:
+        st.write('Terminal Value: {} {:,.4f}'.format(currency,Terminal_value))
+    with tvd:
+        st.write('Terminal value Discounted: {} {:,.4f}'.format(currency,Terminal_value_Discounted,))
+    npvv,tev= st.beta_columns(2)
+    with npvv:
+        st.write('Net Present Value: {} {:,.4f}'.format(currency,npv))
+    with tev:
+        st.write('Target Equity Value: {} {:,.4f}'.format(currency,target_equity_value))
+   
+    st.subheader('Target price per shares: {} {:,.4f}'.format(currency,target_price_per_share))
+        # new_title = '<p style="font-family:sans-serif; color:Gray; font-size: 22px;">Market name: </p><p style="font-family:sans-serif; color:Green; font-size: 12px;">S&P500</p>'
+        # st.markdown(new_title, unsafe_allow_html=True)
+    
+        
+
+        
+
+
+elif fund_menu == "Understanding Market Return":
+    st.title("Understanding Market Return")
+    speriod = st.selectbox('Select the period',['Before pandemic','During pandemic','Current'])
+    nfty50,SP500,nyearlyreturn,gyearlyreturn,gRF,iRF = fundamental.market(symbol,speriod)
+    # gm,im = st.beta_columns(2)
+    # with gm:
+    st.header("Global market")
+    st.subheader("Market name: S&P 500")
+    rf,yr = st.beta_columns(2)
+    with rf:
+        st.subheader("Risk Free rate: {:.4f}".format(gRF))
+    with yr:
+        st.subheader("Yearly return: {:.4f}".format(gyearlyreturn))
+    st.line_chart(SP500)
+        # st.write('Terminal Value: {} {:,.4f}'.format(currency,Terminal_value))
+    # with im:
+        # ,''
+    st.header("Indian market")
+    st.subheader("Market name: Nifty 50")
+    
+    rf,yr = st.beta_columns(2)
+    with rf:
+        st.subheader("Risk Free rate: {:.4f}".format(iRF))
+    with yr:
+        st.subheader("Yearly return: {:.4f}".format(nyearlyreturn))
+    # print(SP500)
+    # print(nfty50)
+    # # print(nfty50[['Date','Close']])
+    # print(nfty50.columns)
+    st.line_chart(nfty50['Close'])

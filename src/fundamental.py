@@ -1,9 +1,9 @@
 # Requires fcf.py to be in same directory for working of this file
-import cinfo_revised as companyinfo
+from src import companyinfo
 import pandas_datareader.data as web
 import yfinance as yf
 import datetime
-import fcf 
+from src import fcf 
 from nsepy import get_history
 import numpy as np
 import pandas as pd
@@ -50,9 +50,9 @@ def base(ticker,market,period):
 
   # RF of india from RBI perspective
   # RF = 0.063640
-  if market == "Global":
+  if market == 'Global Market':
 
-    if period == "current":    
+    if period == "Current":    
       start = datetime.datetime.now() - datetime.timedelta(days=1*365)
       start = start.strftime('%Y-%m-%d')
               
@@ -70,7 +70,7 @@ def base(ticker,market,period):
       # print(rows)
       yearlyreturn = (SP500['sp500'].iloc[-1]/ SP500['sp500'].iloc[-rows])-1
 
-    elif period == "before":
+    elif period == "Before pandemic":
       start = datetime.datetime(2018, 4, 1)
       end= datetime.datetime(2019,4,1)
               
@@ -87,7 +87,7 @@ def base(ticker,market,period):
       # print(rows)
       yearlyreturn = (SP500['sp500'].iloc[-1]/ SP500['sp500'].iloc[-rows])-1
 
-    elif period == "during":
+    elif period == "During pandemic":
       start = datetime.datetime(2020, 4, 1)
       end= datetime.datetime(2021,4,1)
       Treasury = web.DataReader(['TB1YR'], 'fred', start, end)
@@ -101,7 +101,7 @@ def base(ticker,market,period):
       yearlyreturn = (SP500['sp500'].iloc[-1]/ SP500['sp500'].iloc[-rows])-1
 
     
-  elif market == "Indian":
+  elif market == "Indian Market":
     crp_url = 'https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/ctryprem.html'
     crp = extract_table(crp_url)[0]
     df = pd.DataFrame(crp,columns=crp[0])
@@ -112,10 +112,10 @@ def base(ticker,market,period):
     crp_list = list(filter(None, crp))
     crp = float(crp_list[1])/100
     RF = 0.063640 - crp
-    if period == "current":    
+    if period == "Current":    
       start = datetime.datetime.now() - datetime.timedelta(days=1*365)
-      start = start.strftime('%Y-%m-%d')
-      end= datetime.datetime.today().strftime('%Y-%m-%d')
+      # start = start.strftime('%Y-%m-%d')
+      end= datetime.datetime.today()
       nfty50 = get_history(symbol='NIFTY 50', start=start, end=end, index = True)
       nfty50 = pd.DataFrame(nfty50)
       nfty50['Index_Name'] = 'NIFTY 50'
@@ -123,12 +123,10 @@ def base(ticker,market,period):
       yearlyreturn = (nfty50['Close'].iloc[-1]/ nfty50['Close'].iloc[-rows])-1
 
 
-    elif period == "before":
+    elif period == "Before pandemic":
       start = datetime.datetime(2018, 4, 1)
       end= datetime.datetime(2019,4,1)
-      Treasury = web.DataReader(['TB1YR'], 'fred', start, end)
-      RF = float(Treasury.iloc[-1])
-      RF = RF/100
+      
       nfty50 = get_history(symbol='NIFTY 50', start=start, end=end, index = True)
       nfty50 = pd.DataFrame(nfty50)
       nfty50['Index_Name'] = 'NIFTY 50'
@@ -136,12 +134,10 @@ def base(ticker,market,period):
       yearlyreturn = (nfty50['Close'].iloc[-1]/ nfty50['Close'].iloc[-rows])-1
 
 
-    elif period == "during":
+    elif period == "During pandemic":
       start = datetime.datetime(2020, 4, 1)
       end= datetime.datetime(2021,4,1)
-      Treasury = web.DataReader(['TB1YR'], 'fred', start, end)
-      RF = float(Treasury.iloc[-1])
-      RF = RF/100
+      
       nfty50 = get_history(symbol='NIFTY 50', start=start, end=end, index = True)
       nfty50 = pd.DataFrame(nfty50)
       nfty50['Index_Name'] = 'NIFTY 50'
@@ -150,6 +146,112 @@ def base(ticker,market,period):
 
 
   return RF,interest_coverage_ratio,Debt_to,equity_to,ETR,yearlyreturn
+
+def market(ticker,period):
+  
+  if period == "Current":    
+    start = datetime.datetime.now() - datetime.timedelta(days=1*365)
+    # start = start.strftime('%Y-%m-%d')
+            
+    end= datetime.datetime.today()
+    #end = datetime.datetime(2020, 7, 10)
+
+    Treasury = web.DataReader(['TB1YR'], 'fred', start, end)
+    RF = float(Treasury.iloc[-1])
+    gRF = RF/100
+
+    SP500 = web.DataReader(['sp500'], 'fred', start, end)
+    SP500.dropna(inplace = True)
+    # print(SP500)
+    rows = SP500.shape[0]
+    print("sp 500 current")
+    print(rows)
+    gyearlyreturn = (SP500['sp500'].iloc[-1]/ SP500['sp500'].iloc[-rows])-1
+
+
+  elif period == "Before pandemic":
+    start = datetime.datetime(2018, 4, 1)
+    end= datetime.datetime(2019,4,1)
+            
+    # end= datetime.datetime.today().strftime('%Y-%m-%d')
+    #end = datetime.datetime(2020, 7, 10)
+
+    Treasury = web.DataReader(['TB1YR'], 'fred', start, end)
+    RF = float(Treasury.iloc[-1])
+    gRF = RF/100
+    SP500 = web.DataReader(['sp500'], 'fred', start, end)
+    SP500.dropna(inplace = True)
+    # print(SP500)
+    rows = SP500.shape[0]
+    print("sp 500 BP")
+    print(rows)
+    gyearlyreturn = (SP500['sp500'].iloc[-1]/ SP500['sp500'].iloc[-rows])-1
+
+  elif period == "During pandemic":
+    start = datetime.datetime(2020, 4, 1)
+    end= datetime.datetime(2021,4,1)
+    Treasury = web.DataReader(['TB1YR'], 'fred', start, end)
+    RF = float(Treasury.iloc[-1])
+    gRF = RF/100
+    SP500 = web.DataReader(['sp500'], 'fred', start, end)
+    SP500.dropna(inplace = True)
+    # print(SP500)
+    rows = SP500.shape[0]
+    print("sp 500 DP")
+    print(rows)
+    gyearlyreturn = (SP500['sp500'].iloc[-1]/ SP500['sp500'].iloc[-rows])-1
+
+  
+  crp_url = 'https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/ctryprem.html'
+  crp = extract_table(crp_url)[0]
+  df = pd.DataFrame(crp,columns=crp[0])
+  df.drop(index=df.index[0], 
+      axis=0, 
+      inplace=True)
+  crp = str(df[(df.Country == "India")]['Country Risk Premium']).split('%')[0].split(' ')
+  crp_list = list(filter(None, crp))
+  crp = float(crp_list[1])/100
+  iRF = 0.063640 - crp
+
+  if period == "Current":    
+    start = datetime.datetime.now() - datetime.timedelta(days=1*365)
+    # start = start.strftime('%Y-%m-%d')
+    end= datetime.datetime.today()
+    nfty50 = get_history(symbol='NIFTY 50', start=start, end=end, index = True)
+    nfty50 = pd.DataFrame(nfty50)
+    nfty50['Index_Name'] = 'NIFTY 50'
+    rows = nfty50.shape[0]
+    print("n50 current")
+    print(rows)
+    nyearlyreturn = (nfty50['Close'].iloc[-1]/ nfty50['Close'].iloc[-rows])-1
+
+
+  elif period == "Before pandemic":
+    start = datetime.datetime(2018, 4, 1)
+    end= datetime.datetime(2019,4,1)
+    nfty50 = get_history(symbol='NIFTY 50', start=start, end=end, index = True)
+    nfty50 = pd.DataFrame(nfty50)
+    nfty50['Index_Name'] = 'NIFTY 50'
+    rows = nfty50.shape[0]
+    print("n50 bp")
+    print(rows)
+    nyearlyreturn = (nfty50['Close'].iloc[-1]/ nfty50['Close'].iloc[-rows])-1
+
+
+  elif period == "During pandemic":
+    start = datetime.datetime(2020, 4, 1)
+    end= datetime.datetime(2021,4,1)
+    nfty50 = get_history(symbol='NIFTY 50', start=start, end=end, index = True)
+    nfty50 = pd.DataFrame(nfty50)
+    nfty50['Index_Name'] = 'NIFTY 50'
+    rows = nfty50.shape[0]
+    print("n50 dp")
+    print(rows)
+    nyearlyreturn = (nfty50['Close'].iloc[-1]/ nfty50['Close'].iloc[-rows])-1
+
+
+  return nfty50,SP500,nyearlyreturn,gyearlyreturn,gRF,iRF
+
 
 # print(RF, interest_coverage_ratio)
 
@@ -203,7 +305,7 @@ def cost_of_debt(RF,interest_coverage_ratio):
 
   cost_of_debt = RF + credit_spread
   # print("kd:{},RF:{},credit_spread:{},icr:{}".format(cost_of_debt,RF,credit_spread,interest_coverage_ratio))
-  return cost_of_debt
+  return cost_of_debt,credit_spread
 
 
 
@@ -219,7 +321,7 @@ def costofequity(RF,symbol,yearlyreturn):
     # print(msft.info)
     stock_info = cmp.info
     beta = stock_info['beta']
-    print("Beta {}".format(beta))
+    # print("Beta {}".format(beta))
 #Market Return
     # During pandamic 
       # start = datetime.datetime(2019, 7, 10)
@@ -252,20 +354,20 @@ def costofequity(RF,symbol,yearlyreturn):
     cost_of_equity = RF+(beta*(yearlyreturn - RF))
     # print(cost_of_equity)
     #   return cost_of_equity
-    return cost_of_equity
+    return cost_of_equity,beta
 
 def dcf(ticker,type,period):
   RF,interest_coverage_ratio,Debt_to,equity_to,ETR,yearlyreturn = base(ticker,type,period)
-  kd = cost_of_debt(RF,interest_coverage_ratio)
-  ke = costofequity(RF,ticker,yearlyreturn)
+  kd,credit_spread = cost_of_debt(RF,interest_coverage_ratio)
+  ke,beta = costofequity(RF,ticker,yearlyreturn)
   # ke = 0.07
   # Calculating the WACC
   WACC = (kd*(1-ETR)*Debt_to) + (ke*equity_to)
-  print("WACC {},equity_to{},Debt_to{}".format(WACC,equity_to,Debt_to))
-  print("ETR{}".format(ETR))
-  print("ke{},kd{}".format(ke,kd))
-  # WACC = 0.04
-  #FCF
+  # print("WACC {},equity_to{},Debt_to{}".format(WACC,equity_to,Debt_to))
+  # print("ETR{}".format(ETR))
+  # print("ke{},kd{}".format(ke,kd))
+  # # WACC = 0.04
+  # #FCF
   revenue_g,bs_forec,is_forec,CF_forec = fcf.forecast(RF,ticker)
   # print(bs_forec)
   # print(is_forec)
@@ -296,19 +398,19 @@ def dcf(ticker,type,period):
   stock_info = cmp.info
   numbre_of_shares = stock_info['sharesOutstanding']
   # print("Total No. of share holders is {}".format(numbre_of_shares))
-  # currency = stock_info['currency']
+  currency = stock_info['currency']
 
 
   target_price_per_share = target_value/numbre_of_shares
-  print(ticker + ' forecasted price per stock is ' +str(currency)+' '+str(target_price_per_share) )
-  print('the forecast is based on the following assumptions: '+ 'revenue growth: ' + str(revenue_g) + ' Cost of Capital: ' + str(WACC) )
-  print('perpetuity growth: ' + str(LTGrowth)  )
-  return ke,kd,RF,ETR,LTGrowth,Terminal_value,Terminal_value_Discounted,target_equity_value,target_value,target_price_per_share
+  # print(ticker + ' forecasted price per stock is ' +str(currency)+' '+str(target_price_per_share) )
+  # print('the forecast is based on the following assumptions: '+ 'revenue growth: ' + str(revenue_g) + ' Cost of Capital: ' + str(WACC) )
+  # print('perpetuity growth: ' + str(LTGrowth)  )
+  return ke,kd,RF,ETR,LTGrowth,Terminal_value,Terminal_value_Discounted,target_equity_value,target_value,target_price_per_share,beta,credit_spread,WACC,Debt_to,equity_to,npv,revenue_g,bs_forec,CF_forec,is_forec,yearlyreturn,currency
 
-ticker = 'MSFT'
-type = "Indian"
-period = "before"
-dcf(ticker,type,period)
+# ticker = 'MSFT'
+# type = "Indian"
+# period = "before"
+# dcf(ticker,type,period)
 # print(ticker + ' forecasted price per stock is ' +str(currency)+' '+str(target_price_per_share) )
 # print('the forecast is based on the following assumptions: '+ 'revenue growth: ' + str(revenue_g) + ' Cost of Capital: ' + str(WACC) )
 # print('perpetuity growth: ' + str(LTGrowth)  )

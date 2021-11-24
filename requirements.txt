@@ -13,4 +13,5 @@ mplfinance==0.12.7a17
 plotly==5.4.0
 pandas==1.3.3
 html_table_parser==0.1.0
+html-table-parser-python3==0.2.0
 spacytextblob==3.0.1

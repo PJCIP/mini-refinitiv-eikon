@@ -11,6 +11,8 @@ import urllib.request
 import pandas as pd
 from pprint import pprint
 from html_table_parser.parser import HTMLTableParser
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 
 def url_get_contents(url):

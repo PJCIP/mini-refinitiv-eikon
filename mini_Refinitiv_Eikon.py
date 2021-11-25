@@ -1,6 +1,7 @@
 import streamlit as st
 import spacy_streamlit
 import pandas as pd
+from streamlit.proto import DataFrame_pb2
 import yfinance as yfs
 import mplfinance as mpf
 from matplotlib import pyplot as plt
@@ -16,6 +17,7 @@ from src import benish
 from src import sentimentanalyzer
 from src import index
 from src import fundamental
+from src import techanalysis
 plt.style.use("ggplot")
 category= []
 company_name=[]
@@ -381,7 +383,10 @@ elif menu == "ESG":
 fundamental_expander = st.sidebar.beta_expander(label="Fundamental Analysis")
 
 with fundamental_expander:
-        fund_menu = st.selectbox("Let's Explore",["-","Candle chart","Understanding Market Return","DCF","Key Metrics","Ratios"],index =0)
+    # Server type
+    fund_menu = st.selectbox("Let's Explore",["-","Candle chart","Key Metrics","Ratios"],index =0)
+    # Local host
+    # fund_menu = st.selectbox("Let's Explore",["-","Candle chart","Understanding Market Return","DCF","Key Metrics","Ratios"],index =0)
 
 if fund_menu == "Candle chart":
     st.title('Candle chart (Historical data)')
@@ -615,3 +620,83 @@ elif fund_menu == "Understanding Market Return":
     # # print(nfty50[['Date','Close']])
     # print(nfty50.columns)
     st.line_chart(nfty50['Close'])
+
+tech_expander = st.sidebar.beta_expander(label="Technical Analysis")
+with tech_expander:
+    group = st.selectbox('Select a group',['-','Technical Indicators','Technical Strategy'])
+
+   
+if group == 'Technical Indicators':
+
+        st.title('Technical Indicators')
+        period, interval, format = st.beta_columns(3) 
+        # ,,,,,,,,,,
+        period_dict = {'1 day':'1d','5 day':'5d','1 month':'1mo','3 months':'3mo','6 months':'6mo','1 year':'1y','2 years':'2y','5 years':'5y','10 years':'10y','year to date':'ytd','max':'max'}
+        interval_dict ={'1 min':'1m','2 min':'2m','5 min':'5m','15 min':'15m','30 min':'30m','60 min':'60m','90 min':'90m','1 hr':'1h','1 day':'1d','5 day':'5d','1 week':'1wk','1 month':'1mo','3 month':'3mo'}
+        with period:
+                speriod = st.selectbox('Select the period',['1 day','5 day','1 month','3 months','6 months','1 year','2 years','5 years','10 years','year to date','max'])
+
+        with interval:
+            sinterval = st.selectbox('Select the interval',['1 min','2 min','5 min','15 min','30 min','60 min','90 min','1 hr','1 day','5 day','1 week','1 month','3 month'])
+
+        with format:
+            sformat = st.selectbox('Select a format',['Table','Chart'])
+        r_metrics = st.multiselect('Select some parameters', ['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume', 'MACD',
+        'Signal_Line', 'RSI', 'SMA', 'EMA'])
+        if len(r_metrics) == 0:
+            st.info('Please choose atleast one of key_metrics')
+        else:
+           
+
+            data = yfs.download(tickers = symbol, period = period_dict[speriod], interval = interval_dict[sinterval])
+            
+            ta = techanalysis.technical_analysis(data)
+            if sformat == "Table":
+                st.dataframe(ta[r_metrics])
+            elif sformat == "Chart":
+                st.line_chart(ta[r_metrics])
+
+if group == 'Technical Strategy':
+    st.title('Technical Strategy')
+    period, interval, format = st.beta_columns(3) 
+    # ,,,,,,,,,,
+    period_dict = {'1 day':'1d','5 day':'5d','1 month':'1mo','3 months':'3mo','6 months':'6mo','1 year':'1y','2 years':'2y','5 years':'5y','10 years':'10y','year to date':'ytd','max':'max'}
+    interval_dict ={'1 min':'1m','2 min':'2m','5 min':'5m','15 min':'15m','30 min':'30m','60 min':'60m','90 min':'90m','1 hr':'1h','1 day':'1d','5 day':'5d','1 week':'1wk','1 month':'1mo','3 month':'3mo'}
+    with period:
+            speriod = st.selectbox('Select the period',['1 day','5 day','1 month','3 months','6 months','1 year','2 years','5 years','10 years','year to date','max'])
+
+    with interval:
+        sinterval = st.selectbox('Select the interval',['1 min','2 min','5 min','15 min','30 min','60 min','90 min','1 hr','1 day','5 day','1 week','1 month','3 month'])
+
+    with format:
+        sformat = st.selectbox('Select a format',['Table','Chart'])
+
+    data = yfs.download(tickers = symbol, period = period_dict[speriod], interval = interval_dict[sinterval])
+    df = techanalysis.technical_analysis(data)
+    if sformat == "Table":
+        st.dataframe(df)
+    elif sformat == "Chart":
+                # st.line_chart(ta[r_metrics])
+        fig,ax = plt.subplots(figsize=(12.2,4.5))
+        ax.plot(df.index,df['Adj Close'])
+        ax.set_title('Adj. Close Price History')
+        # ax.legend(df.columns.values,loc = 'upper left')
+        st.pyplot(fig)
+
+        fig,ax = plt.subplots(figsize=(12.2,4.5))
+        ax.set_title('RSI Plot')
+        ax.plot(df.index,df['RSI'])
+        ax.axhline(0,linestyle='--', alpha = 0.5, color ='gray')
+        ax.axhline(10,linestyle='--', alpha = 0.5, color ='orange')
+        ax.axhline(20,linestyle='--', alpha = 0.5, color ='green')
+        ax.axhline(30,linestyle='--', alpha = 0.5, color ='red')
+        ax.axhline(70,linestyle='--', alpha = 0.5, color ='red')
+        ax.axhline(80,linestyle='--', alpha = 0.5, color ='green')
+        ax.axhline(90,linestyle='--', alpha = 0.5, color ='orange')
+        ax.axhline(100,linestyle='--', alpha = 0.5, color ='gray')
+        st.pyplot(fig)
+
+
+
+            
+

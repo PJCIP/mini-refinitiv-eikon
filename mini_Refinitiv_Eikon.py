@@ -374,9 +374,32 @@ elif menu == "Financial Statments":
     st.subheader('Income statement')
     st.dataframe(income_statement)
 
+# What is the highest ESG score?
+
 elif menu == "ESG":
     esg_table = companyinfo.esg(symbol)
     st.title('Environmental, Social and Governance')
+    st.subheader("What is ESG?")
+    st.write("Environmental, Social, and Corporate Governance (ESG) is an evaluation of a firm's collective conscientiousness for social and environmental factors. It is typically a score that is compiled from data collected surrounding specific metrics related to intangible assets within the enterprise.")
+    period, interval, format,perf = st.beta_columns(4) 
+    with period:
+        # governanceScore
+# socialScore
+# environmentScore float(esg_table.loc['environmentScore'])
+        st.subheader('Governance Score :{}'.format(float(esg_table.loc['governanceScore'])))
+
+    with interval:
+        st.subheader('Environmental Score :{}'.format(float(esg_table.loc['environmentScore'])))
+
+    with format:
+        st.subheader('Social Score :{}'.format(float(esg_table.loc['socialScore'])))
+    
+    with perf:
+        st.subheader('ESG Performance :{}'.format(str(esg_table.loc['esgPerformance']['Value'])))
+    
+    st.subheader("How to interpret these scores?")
+    st.write("The ESG Risk Ratings are categorized across five risk levels: negligible (0-10), low (10-20), medium (20-30), high (30-40) and severe (40+).")
+    
     st.dataframe(esg_table)
 
 

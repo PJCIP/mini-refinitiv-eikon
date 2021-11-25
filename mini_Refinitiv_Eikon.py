@@ -19,6 +19,16 @@ from src import index
 from src import fundamental
 from src import techanalysis
 plt.style.use("ggplot")
+
+hide_st_style = """
+<style>
+#MainMenu {visibility:hidden;}
+footer {visibility:hidden;}
+</style>
+"""
+
+st.markdown(hide_st_style,unsafe_allow_html=True)
+
 category= []
 company_name=[]
 stock_indices = ["-","NIFTY50","DOW","FTSE100","NASDAQ","SP500"]

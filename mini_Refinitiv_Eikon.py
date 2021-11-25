@@ -508,7 +508,7 @@ elif fund_menu == "DCF":
         smarket = st.selectbox('Select the market',['Global Market','Indian Market'])
         
     with period:
-        speriod = st.selectbox('Select the period',['Before pandemic','During pandemic','Current'])
+        speriod = st.selectbox('Select the period',['Before pandemic','Current'])
 
     
                
@@ -587,12 +587,12 @@ elif fund_menu == "DCF":
 
 elif fund_menu == "Understanding Market Return":
     st.title("Understanding Market Return")
-    speriod = st.selectbox('Select the period',['Before pandemic','During pandemic','Current'])
+    speriod = st.selectbox('Select the period',['Before pandemic','Current'])
     nfty50,SP500,nyearlyreturn,gyearlyreturn,gRF,iRF = fundamental.market(symbol,speriod)
     # gm,im = st.beta_columns(2)
     # with gm:
     st.header("Global market")
-    st.subheader("Market name: S&P 500")
+    st.subheader("Market name: S&P 500 (in USD)")
     rf,yr = st.beta_columns(2)
     with rf:
         st.subheader("Risk Free rate: {:.4f}".format(gRF))
@@ -603,7 +603,7 @@ elif fund_menu == "Understanding Market Return":
     # with im:
         # ,''
     st.header("Indian market")
-    st.subheader("Market name: Nifty 50")
+    st.subheader("Market name: Nifty 50 (in Rs)")
     
     rf,yr = st.beta_columns(2)
     with rf:

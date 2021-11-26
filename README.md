@@ -35,4 +35,4 @@ iii) Technical analysis
 | Matplotlib | [https://matplotlib.org/][PlGa] |
 
 ## User Manual
-Have a look at the user manual [report](https://github.com/PJCIP/-PJCIP-Air-quality-detecting-IOT-device-analysis/blob/master/Reports/Analysis%20on%20Air%20Quality%20Detecting%20IOT%20product.pdf) .
+Have a look at the user manual [report](https://github.com/PJCIP/mini-refinitiv-eikon/blob/main/manual/Mini%20REfinitive%20Eikon.pdf) .
